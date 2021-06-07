@@ -41,7 +41,7 @@ namespace BellProject.Controllers
         {
             var connectionString = @"data source = (LocalDB)\MSSQLLocalDB; attachdbfilename = C:\Users\Home\BellSupport.mdf; integrated security = True";
 
-            tryx    
+            try   
             {
                 string[] DashBoardcount = new string[2];
                 SqlConnection con = new SqlConnection(connectionString);
