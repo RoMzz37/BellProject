@@ -1,0 +1,189 @@
+﻿@model BellProject.Models.Request
+
+@{
+    ViewBag.Title = "Search";
+}
+
+<h2>Search</h2>
+
+
+@using (Html.BeginForm("SearchResults", "Requests")) 
+{
+    @Html.AntiForgeryToken()
+    
+<div class="form-horizontal">
+    <h4>Request</h4>
+    <hr />"
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="form-group">
+        @Html.LabelFor(model => model.project_id, "project_id", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("project_id", null, htmlAttributes: new {@id="pName",  @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.project_id, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.department_id, "department_id", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("department_id", null, htmlAttributes: new { @id="dName",@disabled="disable", @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.department_id, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.employee_id, "employee_id", htmlAttributes: new  {@class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("employee_id", null, htmlAttributes: new { @id="eName", @disabled="disable", @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.employee_id, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+   
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.description, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.description, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.description, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    @Html.DropDownList("employeeFK", null, htmlAttributes: new { @id = "eFK", @class = "form-control" })
+    @Html.DropDownList("departmentFK", null, htmlAttributes: new { @id = "dFK", @class = "form-control" })
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Search" class="btn btn-default" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript">
+
+        var project = document.getElementById("pName");
+        var department = document.getElementById("dName");
+        var employee = document.getElementById("eName");
+        //var description = document.getElementById("desc");
+
+        var departmentList = map(department.querySelectorAll("option"));
+        var employeeList = map(employee.querySelectorAll("option"));
+
+        var employeeFK = document.getElementById("eFK");
+        var departmentFK = document.getElementById("dFK");
+
+        var efkList = employeeFK.querySelectorAll("option");
+        var dfkList = departmentFK.querySelectorAll("option");
+
+
+         //not keeping any data until a project/department is selected
+        clearElements(department);
+        clearElements(employee);
+
+        hide(employeeFK);
+        hide(departmentFK);
+        
+        //adding a blank option for UI
+        addFirstOption(project, "Select a project", "-1");
+        addFirstOption(department, "Select a department", "-1");
+        addFirstOption(employee, "Select Employee Name", "-1");
+
+        project.addEventListener("change", function () {
+
+            //removing the disable from department
+            department.disabled = "";
+            employee.disabled = "disable"
+
+            //Deleting all the elements from department and adding according to the project
+            clearElements(department);
+            addFirstOption(department, "Select a department", "-1");
+
+            for (let element of departmentFK) {
+
+                if (project.value == element.value) {
+                    addOptions(department, element.innerHTML, departmentList[element.innerHTML]);
+                }
+
+            }
+
+
+        });
+
+        department.addEventListener("change", function () {
+
+            //removing the disable from department
+            employee.disabled = "";
+
+            //Deleting all the elements from department and adding according to the project
+            clearElements(employee);
+            addFirstOption(employee, "Select Employee Name", "-1");
+
+            for (let element of employeeFK) {
+
+                if (department.value == element.value) {
+                    addOptions(employee, element.innerHTML, employeeList[element.innerHTML]);
+                }
+
+            }
+
+
+        });
+
+        //Utility Functions
+
+        //clearing out the elements from the list for updating changes
+        function clearElements(select) {
+            var length = select.options.length;
+            for (i = length - 1; i >= 0; i--) {
+                select.options[i] = null;
+            }
+        }
+
+        //adding new options in the list
+        function addOptions(sel, text, value) {
+            var opt = document.createElement("option");
+            opt.appendChild(document.createTextNode(text));
+            opt.value = value;
+            sel.appendChild(opt);
+        }
+
+        //adding the firstOption for good UI
+        function addFirstOption(sel, text, value) {
+            var opt = document.createElement('option');
+            opt.appendChild(document.createTextNode(text));
+            opt.value = value;
+            opt.selected = true;
+            opt.disabled = true;
+            sel.appendChild(opt);
+        }
+
+        function hide(element) {
+            element.style.visibility = 'hidden';
+        }
+
+        function map(list) {
+
+            let obj = {};
+
+            for (let opt of list) {
+
+                let key = opt.innerHTML;
+                let val = opt.value;
+
+                obj[key] = val;
+
+            }
+            return obj;
+        }
+
+    </script>
+
+
+}
